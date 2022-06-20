@@ -16,7 +16,7 @@ body {
 .SpaceImpact {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     width: 100%;
     height: 100%;
     align-items: center;
@@ -25,4 +25,5 @@ body {
 #gameCanvas {
     border: 1px solid;
     border-radius: 2px;
+    margin-bottom: 1em;
 }
