@@ -1,6 +1,9 @@
 import { SHIP_WIDTH, SHIP_HEIGHT, CANVAS_PADDING } from "./constants";
 import renderAllChars from "./components";
 import Observer from "./Observer";
+import { isMobile } from "./utils";
+
+const IS_MOBILE = isMobile();
 
 const canvas = document.getElementById("gameCanvas");
 const documentHeight = window.innerHeight;
@@ -20,7 +23,7 @@ const observer = new Observer();
 const coordinates = {
   myShip: {
     x: Math.floor(MAX_WIDTH / 2),
-    y: MAX_HEIGHT - SHIP_WIDTH,
+    y: MAX_HEIGHT - SHIP_WIDTH * 2,
   },
   enemyShip: {
     x: MAX_WIDTH + 5, // extra 5 to keep the ship away from users view
@@ -37,20 +40,39 @@ const coordinates = {
 renderAllChars(ctx, coordinates);
 
 function steerShip(e) {
-  const { clientX } = e;
+  let { clientX } = e;
+  if (IS_MOBILE) {
+    clientX = e.changedTouches[0].clientX;
+  }
+  coordinates.myShip.x = clientX - CANVAS_PADDING / 2;
+  ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+  renderAllChars(ctx, coordinates);
 }
 
 function handleShipMotionActivation(e) {
-  const { type, clientX } = e;
-  if (type === "mousedown") {
-    coordinates.myShip.x = clientX - CANVAS_PADDING / 2;
-    renderAllChars(ctx, coordinates);
-    canvas.addEventListener("mousemove", steerShip);
+  let { type, clientX } = e;
+  if (IS_MOBILE) {
+    clientX = e.changedTouches[0].clientX;
   }
-  if (type === "mouseup") {
-    canvas.removeEventListener("mousemove", steerShip);
+  if (type === "mousedown" || type === "touchstart") {
+    coordinates.myShip.x = clientX - CANVAS_PADDING / 2;
+    ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+    renderAllChars(ctx, coordinates);
+    canvas.addEventListener(IS_MOBILE ? "touchmove" : "mousemove", steerShip);
+  }
+  if (type === "mouseup" || type === "touchend") {
+    canvas.removeEventListener(
+      IS_MOBILE ? "touchmove" : "mousemove",
+      steerShip
+    );
   }
 }
 
-canvas.addEventListener("mousedown", handleShipMotionActivation);
-canvas.addEventListener("mouseup", handleShipMotionActivation);
+canvas.addEventListener(
+  IS_MOBILE ? "touchstart" : "mousedown",
+  handleShipMotionActivation
+);
+canvas.addEventListener(
+  IS_MOBILE ? "touchend" : "mouseup",
+  handleShipMotionActivation
+);
