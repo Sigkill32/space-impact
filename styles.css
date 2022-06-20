@@ -27,3 +27,15 @@ body {
     border-radius: 2px;
     margin-bottom: 1em;
 }
+
+.SpaceImpact_Shoot {
+    width: calc(100% - 50px);
+    padding: 1em 0;
+}
+
+.SpaceImpact_ScoreCard {
+    display: flex;
+    justify-content: flex-end;
+    width: calc(100% - 50px);
+    margin-top: 1em;
+}

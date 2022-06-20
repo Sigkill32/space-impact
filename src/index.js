@@ -1,11 +1,12 @@
 import { SHIP_WIDTH, SHIP_HEIGHT, CANVAS_PADDING } from "./constants";
 import renderAllChars from "./components";
 import Observer from "./Observer";
-import { isMobile } from "./utils";
+import { isMobile, uuid } from "./utils";
 
 const IS_MOBILE = isMobile();
 
 const canvas = document.getElementById("gameCanvas");
+const shoot = document.querySelector(".SpaceImpact_Shoot");
 const documentHeight = window.innerHeight;
 const documentWidth = window.innerWidth;
 
@@ -29,15 +30,17 @@ const coordinates = {
     x: MAX_WIDTH + 5, // extra 5 to keep the ship away from users view
     y: 0,
   },
-  bullet: {
-    x: MAX_WIDTH / 2,
-    y: MAX_HEIGHT - SHIP_WIDTH,
-  },
+  bullets: {},
 };
 
 /* ------------------------------------------------------------------------------*/
 
 renderAllChars(ctx, coordinates);
+
+function paintScreen() {
+  ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+  renderAllChars(ctx, coordinates);
+}
 
 function steerShip(e) {
   let { clientX } = e;
@@ -45,8 +48,7 @@ function steerShip(e) {
     clientX = e.changedTouches[0].clientX;
   }
   coordinates.myShip.x = clientX - CANVAS_PADDING / 2;
-  ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
-  renderAllChars(ctx, coordinates);
+  paintScreen();
 }
 
 function handleShipMotionActivation(e) {
@@ -56,8 +58,7 @@ function handleShipMotionActivation(e) {
   }
   if (type === "mousedown" || type === "touchstart") {
     coordinates.myShip.x = clientX - CANVAS_PADDING / 2;
-    ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
-    renderAllChars(ctx, coordinates);
+    paintScreen();
     canvas.addEventListener(IS_MOBILE ? "touchmove" : "mousemove", steerShip);
   }
   if (type === "mouseup" || type === "touchend") {
@@ -76,3 +77,26 @@ canvas.addEventListener(
   IS_MOBILE ? "touchend" : "mouseup",
   handleShipMotionActivation
 );
+
+function shootBullet(bulletId) {
+  coordinates.bullets[bulletId].y -= 1;
+  paintScreen();
+  if (coordinates.bullets[bulletId].y >= 0) {
+    requestAnimationFrame(() => shootBullet(bulletId));
+  } else {
+    delete coordinates.bullets[bulletId];
+    paintScreen();
+  }
+}
+
+function createAndShootBullets() {
+  const newBullet = uuid();
+  coordinates.bullets[newBullet] = {
+    x: coordinates.myShip.x,
+    y: coordinates.myShip.y,
+  };
+  paintScreen();
+  shootBullet(newBullet);
+}
+
+shoot.addEventListener("click", createAndShootBullets);
