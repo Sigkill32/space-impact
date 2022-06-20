@@ -5,7 +5,6 @@
 }
 
 html {
-    border: solid;
     height: 100%;
 }
 
@@ -24,5 +23,6 @@ body {
 }
 
 #gameCanvas {
-    border: solid;
+    border: 1px solid;
+    border-radius: 2px;
 }
