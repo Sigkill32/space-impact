@@ -27,7 +27,7 @@ const coordinates = {
     y: MAX_HEIGHT - SHIP_WIDTH * 2,
   },
   enemyShip: {
-    x: MAX_WIDTH + 5, // extra 5 to keep the ship away from users view
+    x: MAX_WIDTH / 2, // extra 5 to keep the ship away from users view
     y: 0,
   },
   bullets: {},
@@ -102,13 +102,18 @@ function createAndShootBullets() {
 shoot.addEventListener("click", createAndShootBullets);
 
 function triggerEnemyShips() {
-  coordinates.enemyShip.x -= 1;
+  coordinates.enemyShip.y += 1;
   paintScreen();
-  if (coordinates.enemyShip.x >= 0) requestAnimationFrame(triggerEnemyShips);
+  if (coordinates.enemyShip.y <= MAX_HEIGHT)
+    requestAnimationFrame(triggerEnemyShips);
   else {
-    coordinates.enemyShip.x = MAX_WIDTH + 5;
+    coordinates.enemyShip.y = 0;
     triggerEnemyShips();
   }
 }
 
-triggerEnemyShips();
+function startGame() {
+  triggerEnemyShips();
+}
+
+startGame();
