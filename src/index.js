@@ -79,7 +79,7 @@ canvas.addEventListener(
 );
 
 function shootBullet(bulletId) {
-  coordinates.bullets[bulletId].y -= 1;
+  coordinates.bullets[bulletId].y -= 5;
   paintScreen();
   if (coordinates.bullets[bulletId].y >= 0) {
     requestAnimationFrame(() => shootBullet(bulletId));
@@ -100,3 +100,15 @@ function createAndShootBullets() {
 }
 
 shoot.addEventListener("click", createAndShootBullets);
+
+function triggerEnemyShips() {
+  coordinates.enemyShip.x -= 1;
+  paintScreen();
+  if (coordinates.enemyShip.x >= 0) requestAnimationFrame(triggerEnemyShips);
+  else {
+    coordinates.enemyShip.x = MAX_WIDTH + 5;
+    triggerEnemyShips();
+  }
+}
+
+triggerEnemyShips();
