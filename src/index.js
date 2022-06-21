@@ -4,7 +4,7 @@ import Observer from "./Observer";
 import { isMobile, uuid } from "./utils";
 
 const IS_MOBILE = isMobile();
-const worker = new Worker("worker.js");
+const worker = new Worker("BulletsWorks.js");
 const canvas = document.getElementById("gameCanvas");
 const shoot = document.querySelector(".SpaceImpact_Shoot");
 const documentHeight = window.innerHeight;
@@ -18,7 +18,6 @@ const MAX_WIDTH = canvas.width;
 const MAX_HEIGHT = canvas.height;
 
 const observer = new Observer();
-worker.postMessage("test");
 
 /* -------------------------------variables---------------------------------------*/
 
@@ -93,14 +92,12 @@ function shootBullet(bulletId) {
 function createAndShootBullets() {
   const newBullet = uuid();
   coordinates.bullets[newBullet] = {
-    x: coordinates.myShip.x,
+    x: coordinates.myShip.x + SHIP_WIDTH / 2,
     y: coordinates.myShip.y,
   };
   paintScreen();
   shootBullet(newBullet);
 }
-
-shoot.addEventListener("click", createAndShootBullets);
 
 function triggerEnemyShips() {
   coordinates.enemyShip.y += 1;
@@ -114,7 +111,11 @@ function triggerEnemyShips() {
 }
 
 function startGame() {
-  triggerEnemyShips();
+  worker.postMessage("START_GAME");
+  worker.onmessage = function (event) {
+    const { data } = event;
+    if (data == "SHOOT_BULLET") createAndShootBullets();
+  };
 }
 
 // startGame();

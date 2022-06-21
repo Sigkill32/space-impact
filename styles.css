@@ -28,7 +28,7 @@ body {
     margin-bottom: 1em;
 }
 
-.SpaceImpact_Shoot {
+.SpaceImpact_StartGame {
     width: calc(100% - 50px);
     padding: 1em 0;
 }
