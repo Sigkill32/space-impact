@@ -6,7 +6,7 @@ import {
 } from "./constants";
 import renderAllChars from "./components";
 import Observer from "./Observer";
-import { isMobile, uuid } from "./utils";
+import { getRandomNum, isMobile, uuid } from "./utils";
 
 const IS_MOBILE = isMobile();
 const worker = new Worker("BulletsWorks.js");
@@ -31,10 +31,7 @@ const coordinates = {
     x: Math.floor(MAX_WIDTH / 2),
     y: MAX_HEIGHT - SHIP_WIDTH * 2,
   },
-  enemyShip: {
-    x: MAX_WIDTH / 2, // extra 5 to keep the ship away from users view
-    y: 0,
-  },
+  enemyShips: {},
   bullets: {},
 };
 
@@ -106,15 +103,26 @@ function createAndShootBullets() {
   shootBullet(newBullet);
 }
 
-function triggerEnemyShips() {
-  coordinates.enemyShip.y += 1;
+function triggerEnemyShips(enemyShipId) {
+  coordinates.enemyShips[enemyShipId].y += 3;
   paintScreen();
-  if (coordinates.enemyShip.y <= MAX_HEIGHT)
-    requestAnimationFrame(triggerEnemyShips);
-  else {
-    coordinates.enemyShip.y = 0;
-    triggerEnemyShips();
+  if (coordinates.enemyShips[enemyShipId].y <= MAX_HEIGHT) {
+    requestAnimationFrame(() => triggerEnemyShips(enemyShipId));
+  } else {
+    delete coordinates.enemyShips[enemyShipId];
+    paintScreen();
   }
+}
+
+function createAndTriggerEnemyShips() {
+  const newEnemyShip = uuid();
+  const x = getRandomNum(0, MAX_WIDTH);
+  coordinates.enemyShips[newEnemyShip] = {
+    x: x,
+    y: 0,
+  };
+  paintScreen();
+  triggerEnemyShips(newEnemyShip);
 }
 
 worker.onmessage = function (event) {
@@ -122,6 +130,7 @@ worker.onmessage = function (event) {
   switch (data) {
     case "SHOOT_BULLET":
       createAndShootBullets();
+      createAndTriggerEnemyShips();
       break;
     case "END_GAME":
       console.log("game ended");

@@ -22,9 +22,17 @@ function renderAllChars(ctx, coordinates) {
   const myShip = ship(ctx, SHIP_WIDTH, SHIP_HEIGHT);
   const enemyShip = ship(ctx, 20, 10);
   myShip(coordinates.myShip.x, coordinates.myShip.y);
-  enemyShip(coordinates.enemyShip.x, coordinates.enemyShip.y);
+  const allEnemyShips = Object.keys(coordinates.enemyShips);
+  if (allEnemyShips.length > 0) {
+    allEnemyShips.forEach((enemyShipId) => {
+      enemyShip(
+        coordinates.enemyShips[enemyShipId].x,
+        coordinates.enemyShips[enemyShipId].y
+      );
+    });
+  }
   const allBullets = Object.keys(coordinates.bullets);
-  if (allBullets.length) {
+  if (allBullets.length > 0) {
     allBullets.forEach((bulletId) => {
       bullet(
         ctx,
