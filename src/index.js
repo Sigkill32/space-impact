@@ -4,7 +4,7 @@ import Observer from "./Observer";
 import { isMobile, uuid } from "./utils";
 
 const IS_MOBILE = isMobile();
-
+const worker = new Worker("worker.js");
 const canvas = document.getElementById("gameCanvas");
 const shoot = document.querySelector(".SpaceImpact_Shoot");
 const documentHeight = window.innerHeight;
@@ -18,6 +18,7 @@ const MAX_WIDTH = canvas.width;
 const MAX_HEIGHT = canvas.height;
 
 const observer = new Observer();
+worker.postMessage("test");
 
 /* -------------------------------variables---------------------------------------*/
 
@@ -116,4 +117,4 @@ function startGame() {
   triggerEnemyShips();
 }
 
-startGame();
+// startGame();
