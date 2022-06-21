@@ -1,9 +1,9 @@
 let timer = null;
 
-function startGame() {
+function mobilizeEnemy() {
   timer = setInterval(() => {
-    postMessage(JSON.stringify({ message: "SHOOT_BULLET", data: null }));
-  }, 100);
+    postMessage(JSON.stringify({ message: "MOBILIZE_ENEMY", data: null }));
+  }, 500);
 }
 
 self.onmessage = function (event) {
@@ -11,7 +11,7 @@ self.onmessage = function (event) {
   const { message, data } = JSON.parse(eventData);
   switch (message) {
     case "START_GAME":
-      startGame();
+      mobilizeEnemy();
       break;
     case "STOP_GAME":
       clearInterval(timer);

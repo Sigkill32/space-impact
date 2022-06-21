@@ -9,7 +9,8 @@ import Observer from "./Observer";
 import { getRandomNum, isMobile, uuid } from "./utils";
 
 const IS_MOBILE = isMobile();
-const worker = new Worker("BulletsWorks.js");
+const bulletWorker = new Worker("BulletsWorks.js");
+const enemyWorker = new Worker("EnemyWorker.js");
 const canvas = document.getElementById("gameCanvas");
 const gameToggle = document.querySelector(".SpaceImpact_GameToggle");
 const documentHeight = window.innerHeight;
@@ -125,16 +126,33 @@ function createAndTriggerEnemyShips() {
   triggerEnemyShips(newEnemyShip);
 }
 
-worker.onmessage = function (event) {
-  const { data } = event;
-  switch (data) {
+bulletWorker.onmessage = function (event) {
+  const { data: eventData } = event;
+  const { message, data } = JSON.parse(eventData);
+  switch (message) {
     case "SHOOT_BULLET":
       createAndShootBullets();
+      break;
+    case "END_GAME":
+      console.log("game ended");
+      break;
+    default:
+      return;
+  }
+};
+
+enemyWorker.onmessage = function (event) {
+  const { data: eventData } = event;
+  const { message, data } = JSON.parse(eventData);
+  switch (message) {
+    case "MOBILIZE_ENEMY":
       createAndTriggerEnemyShips();
       break;
     case "END_GAME":
       console.log("game ended");
       break;
+    default:
+      return;
   }
 };
 
@@ -144,7 +162,8 @@ gameToggle.addEventListener("click", () => {
   } else {
     gameState = "START_GAME";
   }
-  worker.postMessage(gameState);
+  bulletWorker.postMessage(JSON.stringify({ message: gameState, data: null }));
+  enemyWorker.postMessage(JSON.stringify({ message: gameState, data: null }));
   gameToggle.textContent = GAME_STATE_TOGGLE[gameState];
 });
 
