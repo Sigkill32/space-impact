@@ -1,14 +1,23 @@
+let timer = null;
+
 function startGame() {
-  const timer = setInterval(() => {
+  timer = setInterval(() => {
     postMessage("SHOOT_BULLET");
   }, 100);
-  return timer;
 }
 
 self.onmessage = function (event) {
   const { data } = event;
-  let timer = null;
-  if (data == "START_GAME") {
-    timer = startGame();
+  switch (data) {
+    case "START_GAME":
+      startGame();
+      break;
+    case "STOP_GAME":
+      clearInterval(timer);
+      postMessage("END_GAME");
+      break;
+    default:
+      clearInterval(timer);
+      break;
   }
 };

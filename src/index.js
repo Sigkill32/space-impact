@@ -1,4 +1,9 @@
-import { SHIP_WIDTH, SHIP_HEIGHT, CANVAS_PADDING } from "./constants";
+import {
+  SHIP_WIDTH,
+  SHIP_HEIGHT,
+  CANVAS_PADDING,
+  GAME_STATE_TOGGLE,
+} from "./constants";
 import renderAllChars from "./components";
 import Observer from "./Observer";
 import { isMobile, uuid } from "./utils";
@@ -6,7 +11,7 @@ import { isMobile, uuid } from "./utils";
 const IS_MOBILE = isMobile();
 const worker = new Worker("BulletsWorks.js");
 const canvas = document.getElementById("gameCanvas");
-const shoot = document.querySelector(".SpaceImpact_Shoot");
+const gameToggle = document.querySelector(".SpaceImpact_GameToggle");
 const documentHeight = window.innerHeight;
 const documentWidth = window.innerWidth;
 
@@ -32,6 +37,8 @@ const coordinates = {
   },
   bullets: {},
 };
+
+let gameState = "STOP_GAME";
 
 /* ------------------------------------------------------------------------------*/
 
@@ -110,12 +117,26 @@ function triggerEnemyShips() {
   }
 }
 
-function startGame() {
-  worker.postMessage("START_GAME");
-  worker.onmessage = function (event) {
-    const { data } = event;
-    if (data == "SHOOT_BULLET") createAndShootBullets();
-  };
-}
+worker.onmessage = function (event) {
+  const { data } = event;
+  switch (data) {
+    case "SHOOT_BULLET":
+      createAndShootBullets();
+      break;
+    case "END_GAME":
+      console.log("game ended");
+      break;
+  }
+};
+
+gameToggle.addEventListener("click", () => {
+  if (gameState === "START_GAME") {
+    gameState = "STOP_GAME";
+  } else {
+    gameState = "START_GAME";
+  }
+  worker.postMessage(gameState);
+  gameToggle.textContent = GAME_STATE_TOGGLE[gameState];
+});
 
 // startGame();

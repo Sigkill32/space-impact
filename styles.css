@@ -28,7 +28,7 @@ body {
     margin-bottom: 1em;
 }
 
-.SpaceImpact_StartGame {
+.SpaceImpact_GameToggle {
     width: calc(100% - 50px);
     padding: 1em 0;
 }
